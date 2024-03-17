@@ -85,7 +85,7 @@ def relativePosition(rvec1, tvec1, rvec2, tvec2):
     return composedRvec, composedTvec
 
 
-def get_marker_positions_from_base_marker(marker_rvecs, marker_tvecs):
+def get_marker_positions_from_base_marker(marker_rvecs, marker_tvecs, debug=True):
     '''
     Get the position of the markers from the base marker
     '''
@@ -102,10 +102,11 @@ def get_marker_positions_from_base_marker(marker_rvecs, marker_tvecs):
             composedRvec, composedTvec = relativePosition(rvec, tvec,base_marker_rvec, base_marker_tvec)
             output_rvecs[marker_id] = composedRvec.ravel()
             output_tvecs[marker_id] = composedTvec.ravel()
-            print(f"Marker {marker_id} position: ")
-            print(f"x: {composedTvec[0][0]}")
-            print(f"y: {composedTvec[1][0]}")
-            print(f"z: {composedTvec[2][0]}")
+            if debug:
+                print(f"Marker {marker_id} position: ")
+                print(f"x: {composedTvec[0][0]}")
+                print(f"y: {composedTvec[1][0]}")
+                print(f"z: {composedTvec[2][0]}")
 
     return output_rvecs, output_tvecs
 
@@ -201,7 +202,7 @@ if __name__ == "__main__":
                     point = cv.drawFrameAxes(frame, cam_mat, dist_coef, rVec, tVec, marker_size, 4)
 
             if [9] in marker_IDs and len(marker_IDs) > 1:
-                composedRvecs, composedTvecs = get_marker_positions_from_base_marker(marker_rvecs, marker_tvecs)
+                composedRvecs, composedTvecs = get_marker_positions_from_base_marker(marker_rvecs, marker_tvecs, debug=True)
                 baseRvec = marker_rvecs[9]
                 baseTvec = marker_tvecs[9]
 
@@ -211,10 +212,12 @@ if __name__ == "__main__":
                     info = cv.composeRT(composedRvec, composedTvec, baseRvec.T, baseTvec.T)
                     TcomposedRvec, TcomposedTvec = info[0], info[1]
 
+                    # print(f"Marker {marker_ID} position: ")
+                    # print(f"x: {TcomposedTvec[0]} --- {marker_tvecs[marker_ID][0]}")
+                    # print(f"y: {TcomposedTvec[1]} --- {marker_tvecs[marker_ID][1]}")
+                    # print(f"z: {TcomposedTvec[2]} --- {marker_tvecs[marker_ID][2]}")
+
                     cv.drawFrameAxes(frame, cam_mat, dist_coef, TcomposedRvec, TcomposedTvec, 1.5, 4)
-
-                    
-
 
 
         cv.imshow("frame", frame)
