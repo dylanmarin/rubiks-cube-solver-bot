@@ -107,6 +107,10 @@ def get_marker_positions_from_base_marker(marker_rvecs, marker_tvecs, debug=True
                 print(f"x: {composedTvec[0][0]}")
                 print(f"y: {composedTvec[1][0]}")
                 print(f"z: {composedTvec[2][0]}")
+                print(f"Marker {marker_id} rotation: ")
+                print(f"x: {composedRvec[0][0]}")
+                print(f"y: {composedRvec[1][0]}")
+                print(f"z: {composedRvec[2][0]}")
 
     return output_rvecs, output_tvecs
 
