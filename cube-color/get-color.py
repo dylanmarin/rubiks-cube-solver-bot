@@ -34,11 +34,21 @@ if __name__ == "__main__":
         ret, frame = cap.read()
         if not ret:
             break
+        
+        gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
+        marker_corners, marker_IDs, reject = aruco.detectMarkers(
+            gray_frame, marker_dict, parameters=detector_params
+        )
 
+        if marker_corners:
 
+            for corners, marker_id in zip(marker_corners, marker_IDs):
+                transform = cv.getPerspectiveTransform(np.float32(corners), np.array([[200, 200], [200, 300], [300, 300], [300, 200]], dtype=np.float32))
+                frame = cv.warpPerspective(frame, transform,(500, 500),flags=cv.INTER_LINEAR)
+                break
 
-        cv.imshow("frame", frame)
+        # cv.imshow("frame", frame)
         key = cv.waitKey(1)
         if key == ord("q"):
             break
