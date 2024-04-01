@@ -1,4 +1,4 @@
-def convertToRobotMoves(solution):
+def convertToRobotMoves(solution="R1 U1 R3 U3 R3 F1 R2 U3 R3 U3 R1 U1 R3 F3"):
     face_to_rotation_map = {
         'U': 'x x',
         'D': '',
@@ -61,10 +61,10 @@ def convertToRobotMoves(solution):
     readable_converter = {
         'U': 'x2',
         'D': '',
-        'F': "x3",
-        'L': "z3",
-        'B': 'x1',
-        'R': 'z1',
+        'F': "x'",
+        'L': "z'",
+        'B': 'x',
+        'R': 'z',
     }
 
     moves = solution.split(' ')
@@ -74,7 +74,11 @@ def convertToRobotMoves(solution):
         current_move = moves[i]
         direction = current_move[1]
         new_solution.append(readable_converter[current_move[0]])
-        new_solution.append(f'Uw{direction}')
+
+        if direction != '1':
+            new_solution.append("Uw" + ("'" if direction == '3' else '2'))
+        else:
+            new_solution.append('Uw')
 
         rotations = move_affect_map[current_move].split(' ')
 
@@ -90,6 +94,6 @@ def convertToRobotMoves(solution):
                     moves[j] = z_map[moves[j][0]]
                 moves[j] += direction
             
-    print(' '.join(new_solution))
+    print(new_solution)
 
 
