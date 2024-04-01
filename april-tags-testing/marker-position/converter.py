@@ -59,7 +59,7 @@ def convertToRobotMoves(solution="R1 U1 R3 U3 R3 F1 R2 U3 R3 U3 R1 U1 R3 F3"):
     }
 
     readable_converter = {
-        'U': 'x2',
+        'U': 'z2',
         'D': '',
         'F': "x'",
         'L': "z'",
