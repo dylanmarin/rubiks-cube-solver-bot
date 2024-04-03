@@ -114,7 +114,7 @@ def u2(bot):
     bot.gripper.close()
     bot.arm.set_ee_cartesian_trajectory(roll=np.pi)
     bot.gripper.open()
-    # raise_cube_from_home_position(bot, right=True)
+    raise_cube_from_home_position(bot, right=True)
 
 
 def u3(bot):
@@ -218,9 +218,6 @@ def z_prime(bot):
 def main():
     bot = InterbotixManipulatorXS("px150", "arm", "gripper")
 
-    left_side = True
-    right_side = False
-
     # if (bot.arm.group_info.num_joints < 5):
     #     print('This demo requires the robot to have at least 5 joints!')
     #     sys.exit()
@@ -232,20 +229,28 @@ def main():
     bot.arm.go_to_sleep_pose()
 
     z(bot)
-
-    u1(bot)
-
-    z_prime(bot)
-
     u1(bot)
 
     z(bot)
-
     u3(bot)
 
     z_prime(bot)
+    u1(bot)
 
+    z(bot)
     u2(bot)
+
+    z2(bot)
+    u3(bot)
+
+    z_prime(bot)
+    u2(bot)
+
+    z(bot)
+    u1(bot)
+
+    x_prime(bot)
+    u3(bot)
 
     bot.gripper.open()
 
