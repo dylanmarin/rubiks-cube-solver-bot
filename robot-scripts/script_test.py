@@ -114,7 +114,8 @@ def u2(bot):
     bot.gripper.close()
     bot.arm.set_ee_cartesian_trajectory(roll=np.pi)
     bot.gripper.open()
-    raise_cube_from_home_position(bot, right=True)
+    bot.arm.set_ee_cartesian_trajectory(z=0.1)
+
 
 
 def u3(bot):
