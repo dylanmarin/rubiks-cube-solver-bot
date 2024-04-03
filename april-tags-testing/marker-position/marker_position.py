@@ -85,13 +85,11 @@ def relativePosition(rvec1, tvec1, rvec2, tvec2):
     return composedRvec, composedTvec
 
 
-def get_marker_positions_from_base_marker(marker_rvecs, marker_tvecs, debug=True):
+def get_marker_positions_from_base_marker(base_marker_rvec, base_marker_tvec, marker_rvecs, marker_tvecs, debug=True):
     '''
     Get the position of the markers from the base marker
     '''
     base_marker_id = 9
-    base_marker_rvec = marker_rvecs[base_marker_id]
-    base_marker_tvec = marker_tvecs[base_marker_id]
 
     output_rvecs = defaultdict()
     output_tvecs = defaultdict()
@@ -166,6 +164,9 @@ if __name__ == "__main__":
 
     cap = cv.VideoCapture(CAMERA_NUMBER)
 
+    last_base_marker_tvec = None
+    last_base_marker_rvec = None
+
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -203,12 +204,14 @@ if __name__ == "__main__":
                 #     # frame = draw_cube(frame, rVec, tVec, cam_mat, dist_coef, ID_TO_COLOR[marker_ID], sidelength=marker_size)
                 #     point = cv.drawFrameAxes(frame, cam_mat, dist_coef, rVec, tVec, marker_size, 4)
                 if marker_ID == 9:
-                    point = cv.drawFrameAxes(frame, cam_mat, dist_coef, rVec, tVec, marker_size, 4)
+                    last_base_marker_tvec = tVec
+                    last_base_marker_rvec = rVec
+                    point = cv.drawFrameAxes(frame, cam_mat, dist_coef, last_base_marker_rvec, last_base_marker_tvec, marker_size, 4)
 
-            if [9] in marker_IDs and len(marker_IDs) > 1:
-                composedRvecs, composedTvecs = get_marker_positions_from_base_marker(marker_rvecs, marker_tvecs, debug=True)
-                baseRvec = marker_rvecs[9]
-                baseTvec = marker_tvecs[9]
+            if last_base_marker_tvec is not None and last_base_marker_rvec is not None and len(marker_IDs) >= 1:
+                composedRvecs, composedTvecs = get_marker_positions_from_base_marker(last_base_marker_rvec, last_base_marker_tvec, marker_rvecs, marker_tvecs, debug=True)
+                baseRvec = last_base_marker_rvec
+                baseTvec = last_base_marker_tvec
 
                 for marker_ID, composedRvec in composedRvecs.items():
                     composedTvec = composedTvecs[marker_ID]
