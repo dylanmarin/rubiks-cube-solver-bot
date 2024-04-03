@@ -20,20 +20,21 @@ def move_gripper_to_cube_home_position(bot, left=False, right=False):
     if left:
         roll_angle = -np.pi/2
         home_pitch_adjust = -0.05
-        home_x = 0.125
+        home_x = 0.135
     elif right:
         roll_angle = np.pi/2
         home_pitch_adjust = -0.05
-        home_x = 0.125
+        home_x = 0.135
 
 
     # above cube at home
     bot.arm.set_ee_pose_components(
-        x=home_x,z=0.15, 
+        x=home_x,z=0.11, 
         pitch=np.pi/2  + home_pitch_adjust, 
         roll=0)        
     
-    bot.arm.set_ee_pose_components(x=home_x,z=0.15, pitch=np.pi/2 + home_pitch_adjust, roll=roll_angle)
+    if left or right:
+        bot.arm.set_ee_pose_components(x=home_x,z=0.11, pitch=np.pi/2 + home_pitch_adjust, roll=roll_angle)
 
     # grab cube at home (a little bit towards the far end)
     bot.arm.set_ee_pose_components(x=home_x,z=0.045, pitch=np.pi/2+ home_pitch_adjust, roll=roll_angle)
@@ -48,12 +49,11 @@ def raise_cube_from_home_position(bot, left=False, right=False):
     if left:
         roll_angle = -np.pi/2
         home_pitch_adjust = -0.05
-        home_x = 0.125
+        home_x = 0.13
     elif right:
         roll_angle = np.pi/2
         home_pitch_adjust = -0.05
-        home_x = 0.125
-
+        home_x = 0.13
 
     # raise cube directly up
     bot.arm.set_ee_pose_components(x=home_x,z=0.15, pitch=np.pi/2+ home_pitch_adjust, roll=roll_angle)
@@ -61,11 +61,18 @@ def raise_cube_from_home_position(bot, left=False, right=False):
     # move cube forward and pitch it up
     bot.arm.set_ee_pose_components(x=0.2,z=0.25, pitch=0, roll=0)
 
+
+def move_gripper_just_above_home_position(bot):
+    home_x = 0.14
+    # raise cube directly up
+    bot.arm.set_ee_pose_components(x=home_x,z=0.15, pitch=np.pi/2, roll=0)
+    bot.arm.set_ee_pose_components(x=home_x,z=0.07, pitch=np.pi/2, roll=0)
+
 def lower_cube_for_regripping(bot, bottom=False):
     roll = 0
     vertical_offset = 0
     if bottom == True:
-        roll = np.pi
+        roll = np.pi - 0.01
         vertical_offset = 0.005
 
     # rotate arm
@@ -85,7 +92,7 @@ def lower_cube_for_regripping(bot, bottom=False):
     bot.arm.set_ee_pose_components(x=0.175,z=0.07, pitch=np.pi/2, roll=0)
 
 def grip_cube_at_x(bot, x):
-    pitch_offset = -0.01
+    pitch_offset = -0.135
     # move onto cube 
     # add a pitch offset because of arm inconsistency
     bot.arm.set_ee_pose_components(x=x,z=0.07, pitch=np.pi/2 + pitch_offset, roll=0)
@@ -98,7 +105,7 @@ def u1(bot):
     bot.arm.set_ee_cartesian_trajectory(roll=np.pi/2)
     bot.gripper.open()
     bot.arm.set_ee_cartesian_trajectory(z=0.1)
-    raise_cube_from_home_position(bot)
+    # raise_cube_from_home_position(bot)
 
 
 def u2(bot):
@@ -107,7 +114,7 @@ def u2(bot):
     bot.gripper.close()
     bot.arm.set_ee_cartesian_trajectory(roll=np.pi)
     bot.gripper.open()
-    raise_cube_from_home_position(bot, right=True)
+    # raise_cube_from_home_position(bot, right=True)
 
 
 def u3(bot):
@@ -116,9 +123,9 @@ def u3(bot):
     bot.gripper.close()
     bot.arm.set_ee_cartesian_trajectory(roll=-np.pi/2)
     bot.gripper.open()
-    raise_cube_from_home_position(bot)
+    # raise_cube_from_home_position(bot)
 
-def make_near_side_up(bot):
+def x(bot):
     # grabs cube at home
     move_gripper_to_cube_home_position(bot)
 
@@ -131,16 +138,15 @@ def make_near_side_up(bot):
     lower_cube_for_regripping(bot, bottom=True)
 
     # grab the cube at the current x
-    current_cube_x = 0.28
+    current_cube_x = 0.27
     grip_cube_at_x(bot, current_cube_x)
 
-    move_gripper_to_cube_home_position(bot)
+    move_gripper_just_above_home_position(bot)
     bot.gripper.open()
 
-    raise_cube_from_home_position(bot)
+    # raise_cube_from_home_position(bot)
 
-
-def make_far_side_up(bot):
+def x_prime(bot):
     # grabs cube at home
     move_gripper_to_cube_home_position(bot)
 
@@ -153,20 +159,20 @@ def make_far_side_up(bot):
     lower_cube_for_regripping(bot)
 
     # grab the cube at the current x
-    current_cube_x = 0.28
+    current_cube_x = 0.27
     grip_cube_at_x(bot, current_cube_x)
 
-    move_gripper_to_cube_home_position(bot)
+    move_gripper_just_above_home_position(bot)
     bot.gripper.open()
 
-    raise_cube_from_home_position(bot)
+    # raise_cube_from_home_position(bot)
 
+def z2(bot):
+    x_prime(bot)
+    x_prime(bot)
 
-def make_bottom_side_up(bot):
-    make_far_side_up(bot)
-    make_far_side_up(bot)
-
-def make_left_side_up(bot):
+# make left side up
+def z(bot):
     # grabs cube at home
     move_gripper_to_cube_home_position(bot, left=True)
 
@@ -179,16 +185,16 @@ def make_left_side_up(bot):
     lower_cube_for_regripping(bot)
 
     # grab the cube at the current x
-    current_cube_x = 0.28
+    current_cube_x = 0.27
     grip_cube_at_x(bot, current_cube_x)
 
-    move_gripper_to_cube_home_position(bot)
+    move_gripper_just_above_home_position(bot)
     bot.gripper.open()
 
-    raise_cube_from_home_position(bot)
+    # raise_cube_from_home_position(bot)
 
 
-def make_right_side_up(bot):
+def z_prime(bot):
     # grabs cube at home
     move_gripper_to_cube_home_position(bot, right=True)
 
@@ -201,13 +207,13 @@ def make_right_side_up(bot):
     lower_cube_for_regripping(bot)
 
     # grab the cube at the current x
-    current_cube_x = 0.28
+    current_cube_x = 0.265
     grip_cube_at_x(bot, current_cube_x)
 
-    move_gripper_to_cube_home_position(bot)
+    move_gripper_just_above_home_position(bot)
     bot.gripper.open()
 
-    raise_cube_from_home_position(bot)
+    # raise_cube_from_home_position(bot)
 
 def main():
     bot = InterbotixManipulatorXS("px150", "arm", "gripper")
@@ -225,13 +231,26 @@ def main():
     # start
     bot.arm.go_to_sleep_pose()
 
-    # u1(bot)
-    # u2(bot)
-    # u3(bot)
+    z(bot)
 
-    # make_near_side_up(bot)
-    make_right_side_up(bot)
-    make_left_side_up(bot)
+    u1(bot)
+
+    z_prime(bot)
+
+    u1(bot)
+
+    z(bot)
+
+    u3(bot)
+
+    z_prime(bot)
+
+    u2(bot)
+
+    bot.gripper.open()
+
+    move_gripper_just_above_home_position(bot)
+    bot.arm.go_to_sleep_pose()
 
 if __name__=='__main__':
     main()
