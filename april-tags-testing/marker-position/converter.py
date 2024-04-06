@@ -1,9 +1,9 @@
-def convertToRobotMoves(solution="R1 U1 R3 U3 R3 F1 R2 U3 R3 U3 R1 U1 R3 F3"):
+def convertToRobotMoves(solution="R1 D3 R1 D2 U3 R2 B1 D3"):
     face_to_rotation_map = {
         'U': 'x x',
         'D': '',
         'F': 'x x x',
-        'L': 'z z z',
+        'L': 'zi',
         'B': 'x',
         'R': 'z',
     }
@@ -32,12 +32,21 @@ def convertToRobotMoves(solution="R1 U1 R3 U3 R3 F1 R2 U3 R3 U3 R1 U1 R3 F3"):
     }
 
     z_map = {
-        'F': 'F',
-        'B': 'B',
-        'U': 'R',
+        'F': 'L',
+        'B': 'R',
+        'U': 'F',
         'R': 'D',
-        'D': 'L',
+        'D': 'B',
         'L': 'U'
+    }
+
+    z_i_map = {
+        'F': 'R',
+        'B': 'L',
+        'U': 'F',
+        'R': 'U',
+        'D': 'B',
+        'L': 'D'
     }
 
     x_map = {
@@ -75,10 +84,7 @@ def convertToRobotMoves(solution="R1 U1 R3 U3 R3 F1 R2 U3 R3 U3 R1 U1 R3 F3"):
         direction = current_move[1]
         new_solution.append(readable_converter[current_move[0]])
 
-        if direction != '1':
-            new_solution.append("Uw" + ("'" if direction == '3' else '2'))
-        else:
-            new_solution.append('Uw')
+        new_solution.append("Uw" + direction)
 
         rotations = move_affect_map[current_move].split(' ')
 
@@ -92,8 +98,10 @@ def convertToRobotMoves(solution="R1 U1 R3 U3 R3 F1 R2 U3 R3 U3 R1 U1 R3 F3"):
                     moves[j] = y_map[moves[j][0]]
                 elif rotation == 'z':
                     moves[j] = z_map[moves[j][0]]
+                elif rotation == 'zi':
+                    moves[j] = z_i_map[moves[j][0]]
                 moves[j] += direction
             
-    print(new_solution)
+    print(' '.join(new_solution))
 
 

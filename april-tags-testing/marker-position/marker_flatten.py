@@ -21,12 +21,12 @@ ID_TO_COLOR = {
 
 
 colors = {
-    'w': (225, 225, 225), # white
-    'y': (75, 235, 220), # yellow
-    'g': (60, 230, 110), # green
-    'b': (225, 120, 20), # blue
-    'o': (50, 100, 255), # orange
-    'r': (70, 70, 240), # red
+    'w': (200, 200, 210), # white
+    'y': (80, 200, 205), # yellow
+    'g': (75, 140, 50), # green
+    'b': (120, 75, 20), # blue
+    'o': (50, 90, 230), # orange
+    'r': (50, 40, 190), # red
 }
 
 marker_to_color = {
@@ -85,11 +85,129 @@ def convert_to_string(cube_array):
 
     return output
 
+class CubeScanner:
+    def __init__(self, camera_id, camera_name):
+        self.marker_dict = load_dict()
+        self.cam_mat, self.dist_coef = load_calib_data(camera_name)
+        self.detector_params = create_detector_params()
+
+        # thank you https://answers.opencv.org/question/41899/changing-pixel-format-yuyv-to-mjpg-when-capturing-from-webcam/
+        self.cap = cv.VideoCapture(CAMERA_NUMBER, cv.CAP_V4L2)
+        self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+        self.camera_id = camera_id
+        self.camera_name = camera_name
+        
+        self.cube = np.full((6, 3, 3), -1)
+        self.prev_count = 30
+        self.prevs = np.full((self.prev_count, 6, 3, 3), -1)
+
+    def end_scanning(self):
+        self.cap.release()
+        cv.destroyAllWindows()
+
+    def get_solution(self):
+        cube_string = convert_to_string(self.cube)
+        return sv.solve(cube_string)
+
+    def scan_face(self, face_color):
+        marker_id = color_to_marker[face_color]
+        count = 0
+
+        while True:
+            ret, frame = self.cap.read()
+            if not ret:
+                break
+
+            gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+            marker_corners, marker_IDs, _ = aruco.detectMarkers(
+                gray_frame, self.marker_dict, parameters=self.detector_params
+            )
+            current_marker = marker_IDs[0][0] if marker_IDs is not None and len(marker_IDs) > 0 else None
+
+            if current_marker != marker_id: continue
+
+            self.prevs[:, :, 1, 1] = marker_id
+
+            if current_marker is not None:
+                # Needed to ignore marker orientation
+                smallest_point_index = np.argmin(np.sum(marker_corners[0][0], axis=1))
+                yellow_offset = 2 if marker_to_color[current_marker] == 'y' else 0
+                marker_corners[0][0] = np.roll(marker_corners[0][0], yellow_offset + 3 - smallest_point_index, axis=0)
+
+                transform = cv.getPerspectiveTransform(np.float32(marker_corners[0]), np.array([[200, 200], [200, 300], [300, 300], [300, 200]], dtype=np.float32))
+                frame = cv.warpPerspective(frame, transform,(500, 500),flags=cv.INTER_LINEAR)
+
+            center = (250, 250)
+            square_size = 60
+            half_square = int(square_size / 2)
+            gap = 50
+
+            frame = cv.flip(frame, 1)
+
+            frame2 = frame.copy()
+            display = np.zeros((500, 500, 3))
+
+            for j in range(3):
+                startY = center[1] - half_square - gap - square_size + j * (gap + square_size)
+                endY = startY + square_size
+
+                for i in range(3):
+                    startX = center[0] - half_square - gap - square_size + i * (gap + square_size)
+                    endX = startX + square_size
+
+                    try:
+                        cv.rectangle(frame, (startX, startY), (endX, endY), (255,255,255), 3)
+
+                        if i == j == 1:
+                            display[startY:endY, startX:endX] = colors[marker_to_color[current_marker]]
+                            self.cube[current_marker][i][j] = current_marker
+                            continue
+
+                        if current_marker is None: continue
+
+                        subframe = frame2[startY:endY, startX:endX]
+
+                        r, g, b = cv.split(subframe)
+                        r_avg = int(cv.mean(r)[0])
+                        g_avg = int(cv.mean(g)[0])
+                        b_avg = int(cv.mean(b)[0])
+                        # print(r_avg, g_avg, b_avg)
+                        key, color = get_color(r_avg, g_avg, b_avg)
+
+                        marker = color_to_marker[key]
+                        self.prevs[count][current_marker][i][j] = marker
+
+                        if np.all(self.prevs[:, current_marker, i, j] == marker):
+                            display[startY:endY, startX:endX] = color
+                        
+                    except:
+                        continue
+
+            cv.imshow("frame", frame)
+            cv.imshow("display", display / 255)
+
+            key = cv.waitKey(1)
+            if key == ord("q"):
+                break
+
+            if not -1 in self.prevs[:, marker_id]:
+                for i in range(self.prevs.shape[0]):
+                    if not np.array_equal(self.prevs[i], self.prevs[0]):
+                        continue
+                self.cube[current_marker] = self.prevs[0][current_marker]
+
+                print(f'{face_color} side done')
+                return
+
+            count += 1
+            count %= self.prevs.shape[0]
+
+        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get the position of the marker")
     parser.add_argument("-c", "--camera", type=int, help="Enter camera number")
-    parser.add_argument("-n", "--name", type=str, help="Enter camera name")
-
     args = parser.parse_args()
 
     if args.camera is None:
@@ -106,117 +224,15 @@ if __name__ == "__main__":
         CAMERA_NAME = args.name
         print(f"Using camera name {CAMERA_NAME}")
 
-    marker_dict = load_dict()
-    cam_mat, dist_coef = load_calib_data(CAMERA_NAME)
+    cube_scanner = CubeScanner(CAMERA_NUMBER, CAMERA_NAME)
 
-    detector_params = create_detector_params()
+    cube_scanner.scan_face('w')
+    cube_scanner.scan_face('y') # scan yellow green bottom
+    cube_scanner.scan_face('g')
+    cube_scanner.scan_face('b')
+    cube_scanner.scan_face('r')
+    cube_scanner.scan_face('o')
+    print(cube_scanner.cube)
+    cube_scanner.end_scanning()
 
-    # thank you https://answers.opencv.org/question/41899/changing-pixel-format-yuyv-to-mjpg-when-capturing-from-webcam/
-    cap = cv.VideoCapture(CAMERA_NUMBER, cv.CAP_V4L2)
-    cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
-
-
-    cube = np.full((6, 3, 3), -1)
-    prevs = np.full((30, 6, 3, 3), -1)
-    count = 0
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-
-        marker_corners, marker_IDs, reject = aruco.detectMarkers(
-            gray_frame, marker_dict, parameters=detector_params
-        )
-        current_marker = None
-        
-        if len(marker_corners) > 0:
-            dists = [aruco.estimatePoseSingleMarkers(c, 1.5, cam_mat, dist_coef)[1][0][0][2] for c in marker_corners]
-
-            marker_index = np.argmin(dists)
-            if 0 <= marker_index < 6:
-                current_marker = marker_IDs[marker_index][0]
-
-        if marker_corners:
-            for corners, marker_id in zip(marker_corners, marker_IDs):
-                # Needed to ignore marker orientation
-                smallest_point_index = np.argmin(np.sum(corners[0], axis=1))
-                corners[0] = np.roll(corners[0], 3 - smallest_point_index, axis=0)
-
-                transform = cv.getPerspectiveTransform(np.float32(corners), np.array([[200, 200], [200, 300], [300, 300], [300, 200]], dtype=np.float32))
-                frame = cv.warpPerspective(frame, transform,(500, 500),flags=cv.INTER_LINEAR)
-                break
-
-        center = (250, 250)
-        square_size = 60
-        half_square = int(square_size / 2)
-        gap = 50
-
-        frame = cv.flip(frame, 1)
-
-        frame2 = frame.copy()
-        display = np.zeros((500, 500, 3))
-
-        for j in range(3):
-            startY = center[1] - half_square - gap - square_size + j * (gap + square_size)
-            endY = startY + square_size
-
-            for i in range(3):
-                startX = center[0] - half_square - gap - square_size + i * (gap + square_size)
-                endX = startX + square_size
-
-                try:
-                    cv.rectangle(frame, (startX, startY), (endX, endY), (255,255,255), 3)
-
-                    if i == j == 1:
-                        display[startY:endY, startX:endX] = colors[marker_to_color[current_marker]]
-                        cube[current_marker][i][j] = current_marker
-                        continue
-
-                    if current_marker is None: continue
-
-                    subframe = frame2[startY:endY, startX:endX]
-
-                    r, g, b = cv.split(subframe)
-                    r_avg = int(cv.mean(r)[0])
-                    g_avg = int(cv.mean(g)[0])
-                    b_avg = int(cv.mean(b)[0])
-                    # print(r_avg, g_avg, b_avg)
-                    key, color = get_color(r_avg, g_avg, b_avg)
-
-                    marker = color_to_marker[key]
-                    prevs[count][current_marker][i][j] = marker
-
-                    if np.all(prevs[:, current_marker, i, j] == marker):
-                        display[startY:endY, startX:endX] = color
-                        cube[current_marker][i][j] = marker
-
-                except:
-                    continue
-
-        cv.imshow("frame", frame)
-        cv.imshow("display", display / 255)
-        key = cv.waitKey(1)
-        if key == ord("q"):
-            break
-
-        count += 1
-        count %= prevs.shape[0]
-
-    cube_string = convert_to_string(cube)
-    print(cube_string[:9])
-    print(cube_string[9: 18])
-    print(cube_string[18: 27])
-    print(cube_string[27: 36])
-    print(cube_string[36: 45])
-    print(cube_string[45: 54])
-
-    print(sv.solve(cube_string))
-    cap.release()
-    cv.destroyAllWindows()
-
-
+    print(cube_scanner.get_solution())
