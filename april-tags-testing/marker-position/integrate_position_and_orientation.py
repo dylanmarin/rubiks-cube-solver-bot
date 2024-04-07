@@ -215,10 +215,28 @@ if __name__ == "__main__":
     cap = cv.VideoCapture(CAMERA_NUMBER)
 
     # output marker ID for up face and side face
+    # do this so we know which side to check for the cube's x position
     up_marker_id, camera_side_id = get_up_marker_id_camera_marker_id(10)
 
+    # get the cube x position
     cube_x = get_cube_x_position(100)
     print(f"Cube x position: {cube_x}")
-        
+
+    '''
+    Perform initial grasp
+    '''
+
+    '''
+    Perform scans
+    '''
+
+    '''
+    Calculate solve
+    '''
+
+    '''
+    Perform solve
+    '''
+
     cap.release()
     cv.destroyAllWindows()
