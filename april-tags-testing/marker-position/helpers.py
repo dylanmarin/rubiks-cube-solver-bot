@@ -112,3 +112,16 @@ def get_marker_positions_from_base_marker(base_marker_rvec, base_marker_tvec, ma
                 print(f"z: {composedRvec[2][0]}")
 
     return output_rvecs, output_tvecs
+
+
+LARGE_MARKER_SIZE = 3 # centimeters
+
+def get_marker_size(marker_id):
+    '''
+    Get the marker size in centimeters
+    '''
+    if marker_id < 6:
+        return 1.5
+    else:
+        return LARGE_MARKER_SIZE
+    
