@@ -20,7 +20,6 @@ ID_TO_COLOR = {
 
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get the position of the marker")
     parser.add_argument("-c", "--camera", type=int, help="Enter camera number")

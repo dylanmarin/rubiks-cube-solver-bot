@@ -125,3 +125,16 @@ def get_marker_size(marker_id):
     else:
         return LARGE_MARKER_SIZE
     
+
+ID_TO_COLOR_STRING = {
+    0: "white",
+    1: "red",
+    2: "blue",
+    3: "green",
+    4: "orange",
+    5: "yellow",
+    6: "base",
+    7: "base",
+    8: "base",
+    9: "base",
+}
