@@ -21,11 +21,11 @@ def check_directory(dir_path):
         print(f'"{dir_path}" Directory already Exists.')
 
 
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Enter camera number')
+    parser = argparse.ArgumentParser(description='Enter camera port number and camera name')
     parser.add_argument('-c','--camera', type=int, help='Enter camera number')
-    parser.add_argument('-d','--dimension', type=int, help='Enter checkerboard board dimension')
+    parser.add_argument('-n','--name', type=str, help='Enter camera name')
+
     args = parser.parse_args()
 
     n = 0  # image_counter
@@ -37,24 +37,24 @@ if __name__ == "__main__":
         CAMERA_NUMBER = args.camera
         print(f"Using camera number {CAMERA_NUMBER}")
 
-    # check that checkerboard dimension is provided or not
-    if args.dimension is None:
-        CHECKERBOARD_DIM = (7, 7)
-        print(f"Using default checkerboard dimension {CHECKERBOARD_DIM}")
+    if args.name is None:
+        print("Please enter camera name using -n or --name")
+        exit()
     else:
-        CHECKERBOARD_DIM = (args.dimension, args.dimension)
-        print(f"Using checkerboard dimension {CHECKERBOARD_DIM}")
+        CAMERA_NAME = args.name
+        print(f"Using camera name {CAMERA_NAME}")
+
+    CHECKERBOARD_DIM = (7, 7)
 
     # checking if  images dir is exist not, if not then create images directory
-    image_dir_path = f"images_camera_{CAMERA_NUMBER}"
+    image_dir_path = f"images_camera_{CAMERA_NAME}"
     check_directory(image_dir_path)
 
-
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-
     
     # start video capture from camera
     cap = cv.VideoCapture(CAMERA_NUMBER)
+
 
     while True:
         _, frame = cap.read()

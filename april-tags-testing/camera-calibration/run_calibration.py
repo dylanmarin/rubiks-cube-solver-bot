@@ -5,35 +5,21 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Enter camera number')
-    parser.add_argument('-c','--camera', type=int, help='Enter camera number')
-    parser.add_argument('-d','--dimension', type=int, help='Enter checkerboard board dimension')
-    parser.add_argument('-s','--square_size', type=float, help='Enter square size in millimeters')
+    parser = argparse.ArgumentParser(description='Enter camera name')
+    parser.add_argument('-n','--name', type=str, help='Enter camera name')
+
     args = parser.parse_args()
 
-    # check that camera number is provided or not
-    if args.camera is None:
-        print("Please enter camera number using -c or --camera")
+    # check that camera name is provided or not
+    if args.name is None:
+        print("Please enter camera name using -n or --name")
         exit()
     else:
-        CAMERA_NUMBER = args.camera
-        print(f"Using camera number {CAMERA_NUMBER}")
+        CAMERA_NAME = args.name
+        print(f"Using camera name {CAMERA_NAME}")
 
-    # check that checkerboard dimension is provided or not
-    if args.dimension is None:
-        CHECKERBOARD_DIM = (7, 7)
-        print(f"Using default checkerboard dimension {CHECKERBOARD_DIM}")
-    else:
-        CHECKERBOARD_DIM = (args.dimension, args.dimension)
-        print(f"Using checkerboard dimension {CHECKERBOARD_DIM}")
-
-    # check that square size is provided or not
-    if args.square_size is None:
-        SQUARE_SIZE = 25.4
-        print(f"Using default square size {SQUARE_SIZE}")
-    else:
-        SQUARE_SIZE = args.square_size
-        print(f"Using square size {SQUARE_SIZE}")
+    CHECKERBOARD_DIM = (7, 7)
+    SQUARE_SIZE = 25.4
 
     
     # termination criteria
@@ -62,7 +48,7 @@ if __name__ == "__main__":
     img_points_2D = []  # 2d points in image plane.
 
     # The images directory path
-    image_dir_path = image_dir_path = f"images_camera_{CAMERA_NUMBER}"
+    image_dir_path = image_dir_path = f"images_camera_{CAMERA_NAME}"
 
     files = os.listdir(image_dir_path)
     for file in files:
@@ -88,7 +74,7 @@ if __name__ == "__main__":
 
     print("duming the data into one file using numpy ")
     np.savez(
-        f"{calib_data_path}/MultiMatrix_Camera_{CAMERA_NUMBER}",
+        f"{calib_data_path}/MultiMatrix_Camera_{CAMERA_NAME}",
         camMatrix=mtx,
         distCoef=dist,
         rVector=rvecs,
@@ -99,7 +85,7 @@ if __name__ == "__main__":
 
     print("loading data stored using numpy savez function\n \n \n")
 
-    data = np.load(f"{calib_data_path}/MultiMatrix_Camera_{CAMERA_NUMBER}.npz")
+    data = np.load(f"{calib_data_path}/MultiMatrix_Camera_{CAMERA_NAME}.npz")
 
     camMatrix = data["camMatrix"]
     distCof = data["distCoef"]
