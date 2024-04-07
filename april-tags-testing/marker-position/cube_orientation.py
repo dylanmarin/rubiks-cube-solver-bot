@@ -145,7 +145,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get the position of the marker")
     parser.add_argument("-c", "--camera", type=int, help="Enter camera number")
     parser.add_argument("-n", "--name", type=str, help="Enter camera name")
-    parser.add_argument("-m", "--marker_size", type=float, help="Enter the large marker size in centimeters")
+
     args = parser.parse_args()
 
     if args.camera is None:
@@ -161,14 +161,6 @@ if __name__ == "__main__":
     else:
         CAMERA_NAME = args.name
         print(f"Using camera name {CAMERA_NAME}")
-
-    if args.marker_size is None:
-        LARGE_MARKER_SIZE = 3 # centimeters
-        print(f"Using default large marker size {LARGE_MARKER_SIZE}")
-    else:
-        LARGE_MARKER_SIZE = args.marker_size
-        print(f"Using marker size {LARGE_MARKER_SIZE}")
-    
 
     marker_dict = load_dict()
     cam_mat, dist_coef = load_calib_data(CAMERA_NAME)

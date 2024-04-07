@@ -3,7 +3,7 @@ import numpy as np
 from cv2 import aruco
 import argparse
 from collections import defaultdict
-from helpers import load_dict, load_calib_data, create_detector_params, get_marker_positions_from_base_marker
+from helpers import load_dict, load_calib_data, create_detector_params, get_marker_positions_from_base_marker, get_marker_size
 
 ID_TO_COLOR = {
     0: (0, 255, 0),
@@ -25,7 +25,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get the position of the marker")
     parser.add_argument("-c", "--camera", type=int, help="Enter camera number")
     parser.add_argument("-n", "--name", type=str, help="Enter camera name")
-    parser.add_argument("-m", "--marker_size", type=float, help="Enter the large marker size in centimeters")
     args = parser.parse_args()
 
     if args.camera is None:
@@ -41,23 +40,7 @@ if __name__ == "__main__":
     else:
         CAMERA_NAME = args.name
         print(f"Using camera name {CAMERA_NAME}")
-
-    if args.marker_size is None:
-        LARGE_MARKER_SIZE = 3 # centimeters
-        print(f"Using default large marker size {LARGE_MARKER_SIZE}")
-    else:
-        LARGE_MARKER_SIZE = args.marker_size
-        print(f"Using marker size {LARGE_MARKER_SIZE}")
     
-    def get_marker_size(marker_id):
-        '''
-        Get the marker size in centimeters
-        '''
-        if marker_id < 6:
-            return 1.5
-        else:
-            return LARGE_MARKER_SIZE
-
     marker_dict = load_dict()
     cam_mat, dist_coef = load_calib_data(CAMERA_NAME)
 
