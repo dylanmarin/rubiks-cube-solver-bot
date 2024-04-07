@@ -227,6 +227,10 @@ if __name__ == "__main__":
     '''
 
     '''
+    Move into known orientation for scanning
+    '''
+
+    '''
     Perform scans
     '''
 
