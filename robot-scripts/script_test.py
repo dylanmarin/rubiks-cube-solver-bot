@@ -287,6 +287,24 @@ def full_scan(bot, step=None):
         sleep(1)
 
 
+def perform_actions(bot, actions):
+    for act in actions:
+        if act == "z":
+            z(bot)
+        elif act == "z'":
+            z_prime(bot)
+        elif act == "x":
+            x(bot)
+        elif act == "x'":
+            x_prime(bot)
+        elif act == "z2":
+            z2(bot)
+        elif act == "u":
+            u1(bot)
+        elif act == "u2":
+            u2(bot)
+        elif act == "u'":
+            u3(bot)
 
 def main():
     bot = InterbotixManipulatorXS("px150", "arm", "gripper")
