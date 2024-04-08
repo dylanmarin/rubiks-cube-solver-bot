@@ -53,7 +53,12 @@ if __name__ == "__main__":
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     
     # start video capture from camera
-    cap = cv.VideoCapture(CAMERA_NUMBER)
+    # thank you https://answers.opencv.org/question/41899/changing-pixel-format-yuyv-to-mjpg-when-capturing-from-webcam/
+    cap = cv.VideoCapture(CAMERA_NUMBER, cv.CAP_V4L2)
+    cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+
 
 
     while True:
@@ -61,7 +66,7 @@ if __name__ == "__main__":
         copyFrame = frame.copy()
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-        image, board_detected = detect_checker_board(frame, gray, criteria, CHECKERBOARD_DIM)
+        # image, board_detected = detect_checker_board(frame, gray, criteria, CHECKERBOARD_DIM)
 
         cv.putText(
             frame,
@@ -108,6 +113,9 @@ if __name__ == "__main__":
         key = cv.waitKey(1)
         if key == ord("q"):
             break
+
+
+        board_detected = True
         if key == ord("s") and board_detected == True:
             # storing the checker board image
             cv.imwrite(f"{image_dir_path}/image{n}.png", copyFrame)
