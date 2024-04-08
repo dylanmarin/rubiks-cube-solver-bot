@@ -85,8 +85,9 @@ def lower_cube_for_regripping(bot, bottom=False):
     # move gripper back
     bot.arm.set_ee_pose_components(x=0.25,z=0.15, pitch=0, roll=roll)
 
-    # reset the roll
-    bot.arm.set_ee_pose_components(x=0.25,z=0.15, pitch=0, roll=0)
+    if roll != 0:
+        # reset the roll
+        bot.arm.set_ee_pose_components(x=0.25,z=0.15, pitch=0, roll=0)
 
     # point gripper down
     bot.arm.set_ee_pose_components(x=0.175,z=0.07, pitch=np.pi/2, roll=0)
@@ -215,6 +216,76 @@ def z_prime(bot):
     bot.gripper.open()
 
     # raise_cube_from_home_position(bot)
+
+
+BEST_SCAN_X = 0.2
+def scan_left(bot):
+    bot.arm.set_ee_pose_components(x=BEST_SCAN_X, z=0.2, roll=-np.pi/2)
+
+def scan_right(bot):
+    bot.arm.set_ee_pose_components(x=BEST_SCAN_X, z=0.2, roll=np.pi/2)
+
+
+def full_scan(bot, step=None):
+    if step is None or step==0:
+        # make first grab
+        move_gripper_to_cube_home_position(bot)
+        bot.gripper.close()
+        raise_cube_from_home_position(bot)
+    
+    if step is None or step==1:
+        # scan blue side with white to camera right
+        scan_left(bot)
+
+        sleep(1)
+
+    if step is None or step==2:
+        # scan right with white right
+        scan_right(bot)
+        sleep(1)
+
+    if step is None or step==3:
+        # place cube for regripping
+        move_gripper_just_above_home_position(bot)
+        bot.gripper.open()
+
+    if step is None or step==4:
+        move_gripper_to_cube_home_position(bot, left=True)
+        bot.gripper.close()
+        raise_cube_from_home_position(bot, left=True)
+
+        # orange, white right
+        scan_left(bot)
+    
+        sleep(1)      
+
+    if step is None or step==5:
+        # red, white right
+        scan_right(bot)
+
+        sleep(1)
+
+
+    if step is None or step==6:
+        # place the cube down for re-gripping
+        lower_cube_for_regripping(bot)
+
+        # grab the cube at the current x
+        current_cube_x = 0.27
+        grip_cube_at_x(bot, current_cube_x)
+
+        # yellow, green down
+        scan_left(bot)
+
+        sleep(1)
+
+    if step is None or step==7:
+        # white, green up
+        scan_right(bot)
+        
+        sleep(1)
+
+
 
 def main():
     bot = InterbotixManipulatorXS("px150", "arm", "gripper")
