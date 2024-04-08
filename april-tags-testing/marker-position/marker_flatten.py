@@ -92,15 +92,16 @@ class CubeScanner:
         self.detector_params = create_detector_params()
 
         # thank you https://answers.opencv.org/question/41899/changing-pixel-format-yuyv-to-mjpg-when-capturing-from-webcam/
-        self.cap = cv.VideoCapture(CAMERA_NUMBER, cv.CAP_V4L2)
-        self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
-        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
-        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+        self.cap = cv.VideoCapture(CAMERA_NUMBER)
+        # self.cap = cv.VideoCapture(CAMERA_NUMBER, cv.CAP_V4L2)
+        # self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+        # self.cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+        # self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
         self.camera_id = camera_id
         self.camera_name = camera_name
         
         self.cube = np.full((6, 3, 3), -1)
-        self.prev_count = 5
+        self.prev_count = 30
         self.prevs = np.full((self.prev_count, 6, 3, 3), -1)
 
     def end_scanning(self):
@@ -210,7 +211,7 @@ class CubeScanner:
             
             if is_full() and prev_equal():
                 self.cube[current_marker] = self.prevs[0][current_marker]
-                # print(self.prevs[:, marker_id])
+                print(self.prevs[:, marker_id])
                 print(f'{face_color} side done')
                 return
 
@@ -221,6 +222,7 @@ class CubeScanner:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get the position of the marker")
     parser.add_argument("-c", "--camera", type=int, help="Enter camera number")
+    parser.add_argument("-n", "--name", type=str, help="Enter camera name")
     args = parser.parse_args()
 
     if args.camera is None:
