@@ -5,8 +5,8 @@ __pycache__/
 image*.png
 
 
-calib-data/*.npz
-*.npz
+calib-data
+
 
 *.py[cod]
 *$py.class
