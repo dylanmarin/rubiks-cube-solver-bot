@@ -218,42 +218,8 @@ class CubeScanner:
             count += 1
             count %= self.prevs.shape[0]
 
-        
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Get the position of the marker")
-    parser.add_argument("-c", "--camera", type=int, help="Enter camera number")
-    parser.add_argument("-n", "--name", type=str, help="Enter camera name")
-    args = parser.parse_args()
 
-    if args.camera is None:
-        print("Please enter camera number using -c or --camera")
-        exit()
-    else:
-        CAMERA_NUMBER = args.camera
-        print(f"Using camera number {CAMERA_NUMBER}")
-
-    if args.name is None:
-        print("Please enter camera name using -n or --name")
-        exit()
-    else:
-        CAMERA_NAME = args.name
-        print(f"Using camera name {CAMERA_NAME}")
-
-    cube_scanner = CubeScanner(CAMERA_NUMBER, CAMERA_NAME)
-
-    cube_scanner.scan_face('b', 3)
-    cube_scanner.scan_face('g', 3) # scan yellow green bottom
-    cube_scanner.scan_face('o', 3)
-    cube_scanner.scan_face('r', 3)
-    cube_scanner.scan_face('y', 2)
-    cube_scanner.scan_face('w', 0)
-    print(cube_scanner.cube)
-    cube_scanner.end_scanning()
-
-    print(cube_scanner.get_solution())
-
-
-    def re_orient_cube(top_id, front_id):
+def re_orient_cube(top_id, front_id):
         top_color = marker_to_color[top_id]
         front_color = marker_to_color[front_id]
         value = top_color + front_color
@@ -289,4 +255,40 @@ if __name__ == "__main__":
             'ow': "x y'",
         }
 
-        return ' '.split(mapper[value])
+        return mapper[value].split(' ')
+        
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Get the position of the marker")
+    parser.add_argument("-c", "--camera", type=int, help="Enter camera number")
+    parser.add_argument("-n", "--name", type=str, help="Enter camera name")
+    args = parser.parse_args()
+
+    if args.camera is None:
+        print("Please enter camera number using -c or --camera")
+        exit()
+    else:
+        CAMERA_NUMBER = args.camera
+        print(f"Using camera number {CAMERA_NUMBER}")
+
+    if args.name is None:
+        print("Please enter camera name using -n or --name")
+        exit()
+    else:
+        CAMERA_NAME = args.name
+        print(f"Using camera name {CAMERA_NAME}")
+
+    cube_scanner = CubeScanner(CAMERA_NUMBER, CAMERA_NAME)
+
+    cube_scanner.scan_face('b', 3)
+    cube_scanner.scan_face('g', 3) # scan yellow green bottom
+    cube_scanner.scan_face('o', 3)
+    cube_scanner.scan_face('r', 3)
+    cube_scanner.scan_face('y', 2)
+    cube_scanner.scan_face('w', 0)
+    print(cube_scanner.cube)
+    cube_scanner.end_scanning()
+
+    print(cube_scanner.get_solution())
+
+
+    
