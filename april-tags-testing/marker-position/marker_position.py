@@ -45,7 +45,11 @@ if __name__ == "__main__":
 
     detector_params = create_detector_params()
 
-    cap = cv.VideoCapture(CAMERA_NUMBER)
+    # thank you https://answers.opencv.org/question/41899/changing-pixel-format-yuyv-to-mjpg-when-capturing-from-webcam/
+    cap = cv.VideoCapture(CAMERA_NUMBER, cv.CAP_V4L2)
+    cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
 
     last_base_marker_tvec = None
     last_base_marker_rvec = None
