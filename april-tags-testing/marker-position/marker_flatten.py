@@ -100,7 +100,7 @@ class CubeScanner:
         self.camera_name = camera_name
         
         self.cube = np.full((6, 3, 3), -1)
-        self.prev_count = 30
+        self.prev_count = 5
         self.prevs = np.full((self.prev_count, 6, 3, 3), -1)
 
     def end_scanning(self):
@@ -111,9 +111,26 @@ class CubeScanner:
         cube_string = convert_to_string(self.cube)
         return sv.solve(cube_string)
 
-    def scan_face(self, face_color):
+    # rotation_index is number of times to rotate face by 90 degress counter-clockwise
+    def scan_face(self, face_color, rotation_index):
         marker_id = color_to_marker[face_color]
         count = 0
+
+        def is_full():
+            for instance in self.prevs:
+                for row in instance[marker_id]:
+                    for sticker in row:
+                        if sticker == -1:
+                            return False
+            return True
+        
+        def prev_equal():
+            for i in range(self.prevs.shape[0] - 1):
+                for j in range(3):
+                    for k in range(3):
+                        if self.prevs[i][marker_id][j][k] != self.prevs[i + 1][marker_id][j][k]:
+                            return False
+            return True
 
         while True:
             ret, frame = self.cap.read()
@@ -133,8 +150,7 @@ class CubeScanner:
             if current_marker is not None:
                 # Needed to ignore marker orientation
                 smallest_point_index = np.argmin(np.sum(marker_corners[0][0], axis=1))
-                yellow_offset = 2 if marker_to_color[current_marker] == 'y' else 0
-                marker_corners[0][0] = np.roll(marker_corners[0][0], yellow_offset + 3 - smallest_point_index, axis=0)
+                marker_corners[0][0] = np.roll(marker_corners[0][0], rotation_index + 3 - smallest_point_index, axis=0)
 
                 transform = cv.getPerspectiveTransform(np.float32(marker_corners[0]), np.array([[200, 200], [200, 300], [300, 300], [300, 200]], dtype=np.float32))
                 frame = cv.warpPerspective(frame, transform,(500, 500),flags=cv.INTER_LINEAR)
@@ -191,13 +207,10 @@ class CubeScanner:
             key = cv.waitKey(1)
             if key == ord("q"):
                 break
-
-            if not -1 in self.prevs[:, marker_id]:
-                for i in range(self.prevs.shape[0]):
-                    if not np.array_equal(self.prevs[i], self.prevs[0]):
-                        continue
+            
+            if is_full() and prev_equal():
                 self.cube[current_marker] = self.prevs[0][current_marker]
-
+                # print(self.prevs[:, marker_id])
                 print(f'{face_color} side done')
                 return
 
@@ -226,12 +239,12 @@ if __name__ == "__main__":
 
     cube_scanner = CubeScanner(CAMERA_NUMBER, CAMERA_NAME)
 
-    cube_scanner.scan_face('w')
-    cube_scanner.scan_face('y') # scan yellow green bottom
-    cube_scanner.scan_face('g')
-    cube_scanner.scan_face('b')
-    cube_scanner.scan_face('r')
-    cube_scanner.scan_face('o')
+    cube_scanner.scan_face('b', 3)
+    cube_scanner.scan_face('g', 3) # scan yellow green bottom
+    cube_scanner.scan_face('o', 3)
+    cube_scanner.scan_face('r', 3)
+    cube_scanner.scan_face('y', 2)
+    cube_scanner.scan_face('w', 0)
     print(cube_scanner.cube)
     cube_scanner.end_scanning()
 
