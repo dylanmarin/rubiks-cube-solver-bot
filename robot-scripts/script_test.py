@@ -75,8 +75,9 @@ def lower_cube_for_regripping(bot, bottom=False):
         roll = np.pi - 0.01
         vertical_offset = 0.005
 
-    # rotate arm
-    bot.arm.set_ee_pose_components(x=0.2,z=0.25, pitch=0, roll=roll)
+    if roll != 0:
+        # reset the roll
+        bot.arm.set_ee_pose_components(x=0.25,z=0.15, pitch=0, roll=0)
 
     # lower cube and drop it
     bot.arm.set_ee_pose_components(x=0.25, z=0.065 + vertical_offset, pitch=0, roll=roll)
