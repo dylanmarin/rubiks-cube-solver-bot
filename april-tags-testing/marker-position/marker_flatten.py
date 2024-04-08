@@ -251,3 +251,42 @@ if __name__ == "__main__":
     cube_scanner.end_scanning()
 
     print(cube_scanner.get_solution())
+
+
+    def re_orient_cube(top_id, front_id):
+        top_color = marker_to_color[top_id]
+        front_color = marker_to_color[front_id]
+        value = top_color + front_color
+        mapper = {
+            'wg': '',
+            'wr': "y'",
+            'wb': "y2",
+            'wo': "y",
+
+            'gw': 'x y2',
+            'go': 'z',
+            'gy': "x'",
+            'gr': "z'",
+
+            'rg': "z y'",
+            'ry': "x' y'",
+            'rb': "x' z'",
+            'rw': 'x y',
+
+            'bo': "z' y2",
+            'bw': 'x',
+            'br': 'z y2',
+            'by': 'x y2',
+
+            'yg': 'z2 y2',
+            'yo': "z2 y'",
+            'yb': 'z2',
+            'yr': 'z2 y',
+
+            'ob': 'z y',
+            'oy': 'x y',
+            'og': "z' y",
+            'ow': "x y'",
+        }
+
+        return ' '.split(mapper[value])
