@@ -224,35 +224,35 @@ def re_orient_cube(top_id, front_id):
         front_color = marker_to_color[front_id]
         value = top_color + front_color
         mapper = {
-            'wg': '',
-            'wr': "y'",
-            'wb': "y2",
-            'wo': "y",
+            'wg': "y'",
+            'wr': "y2",
+            'wb': "yy",
+            'wo': "",
 
-            'gw': 'x y2',
-            'go': 'z',
-            'gy': "x'",
-            'gr': "z'",
+            'gw': 'z',
+            'go': "x'",
+            'gy': "z'",
+            'gr': "x y2",
 
-            'rg': "z y'",
-            'ry': "x' y'",
-            'rb': "x' z'",
-            'rw': 'x y',
+            'rg': "x' y'",
+            'ry': "z' y'",
+            'rb': "x y",
+            'rw': "z y'",
 
-            'bo': "z' y2",
-            'bw': 'x',
-            'br': 'z y2',
-            'by': 'x y2',
+            'bo': "x",
+            'bw': 'z y2',
+            'br': "x' y2",
+            'by': "z' y2",
 
-            'yg': 'z2 y2',
-            'yo': "z2 y'",
-            'yb': 'z2',
-            'yr': 'z2 y',
+            'yg': "z2 y'",
+            'yo': "z2",
+            'yb': 'z2 y',
+            'yr': 'z2 y2',
 
-            'ob': 'z y',
-            'oy': 'x y',
-            'og': "z' y",
-            'ow': "x y'",
+            'ob': "x' y",
+            'oy': "z' y",
+            'og': "x y'",
+            'ow': "z y",
         }
 
         return mapper[value].split(' ')
