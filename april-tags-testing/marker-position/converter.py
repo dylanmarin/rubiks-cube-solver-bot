@@ -1,4 +1,4 @@
-def convertToRobotMoves(solution="B1 R1"):
+def convertToRobotMoves(solution="B1 R1 (2f)"):
     face_to_rotation_map = {
         'U': 'x x',
         'D': '',
@@ -85,7 +85,7 @@ def convertToRobotMoves(solution="B1 R1"):
         'R': 'z',
     }
 
-    moves = solution.split(' ')
+    moves = solution.split(' ')[:-1]
     new_solution = []
 
 
