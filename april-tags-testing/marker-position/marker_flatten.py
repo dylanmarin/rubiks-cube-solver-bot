@@ -232,14 +232,14 @@ def re_orient_cube(top_id, front_id):
         'gw': 'z',
         'go': "x'",
         'gy': "z'",
-        'gr': "x y2",
+        'gr': "x",
 
         'rg': "x' y'",
         'ry': "z' y'",
-        'rb': "x y",
+        'rb': "x y'",
         'rw': "z y'",
 
-        'bo': "x",
+        'bo': "x y2",
         'bw': 'z y2',
         'br': "x' y2",
         'by': "z' y2",
@@ -251,7 +251,7 @@ def re_orient_cube(top_id, front_id):
 
         'ob': "x' y",
         'oy': "z' y",
-        'og': "x y'",
+        'og': "x y",
         'ow': "z y",
     }
 
