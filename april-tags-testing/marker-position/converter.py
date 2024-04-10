@@ -88,6 +88,11 @@ def convertToRobotMoves(solution="B1 R1"):
     moves = solution.split(' ')
     new_solution = []
 
+
+    for i in range(len(moves)):
+        moves[i] = z_map[moves[i][0]] + moves[i][1]
+
+
     for i in range(len(moves)):
         current_move = moves[i]
         direction = current_move[1]
@@ -113,7 +118,7 @@ def convertToRobotMoves(solution="B1 R1"):
                     moves[j] = z_i_map[moves[j][0]]
                 moves[j] += direction
             
-    # return new_solution
-    print(' '.join(new_solution))
+    return new_solution
+    # print(' '.join(new_solution))
 
 
