@@ -218,6 +218,44 @@ def z_prime(bot):
 
     # raise_cube_from_home_position(bot)
 
+def y_prime(bot):
+    # grabs cube at home
+    move_gripper_to_cube_home_position(bot, right=True)
+    bot.gripper.close()
+    
+    # raises cube directly up and straightens it out
+    raise_cube_from_home_position(bot, right=True)
+
+    move_gripper_just_above_home_position(bot)
+    bot.gripper.open()
+
+
+def y(bot):
+    # grabs cube at home
+    move_gripper_to_cube_home_position(bot, left=True)
+    bot.gripper.close()
+    
+    # raises cube directly up and straightens it out
+    raise_cube_from_home_position(bot, left=True)
+
+    move_gripper_to_cube_home_position(bot)
+    bot.gripper.open()
+
+
+def y2(bot):
+    # grabs cube at home
+    move_gripper_to_cube_home_position(bot, left=True)
+    bot.gripper.close()
+    
+    # raises cube directly up and straightens it out
+    raise_cube_from_home_position(bot, left=True)
+
+    # roll another 90º from straight
+    bot.arm.set_ee_cartesian_trajectory(roll=np.pi/2)
+
+    move_gripper_to_cube_home_position(bot)
+    bot.gripper.open()
+
 
 BEST_SCAN_X = 0.2
 def scan_left(bot):
