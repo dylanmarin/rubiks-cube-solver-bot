@@ -220,42 +220,42 @@ class CubeScanner:
 
 
 def re_orient_cube(top_id, front_id):
-        top_color = marker_to_color[top_id]
-        front_color = marker_to_color[front_id]
-        value = top_color + front_color
-        mapper = {
-            'wg': "y'",
-            'wr': "y2",
-            'wb': "yy",
-            'wo': "",
+    top_color = marker_to_color[top_id]
+    front_color = marker_to_color[front_id]
+    value = top_color + front_color
+    mapper = {
+        'wg': "y'",
+        'wr': "y2",
+        'wb': "y",
+        'wo': "",
 
-            'gw': 'z',
-            'go': "x'",
-            'gy': "z'",
-            'gr': "x y2",
+        'gw': 'z',
+        'go': "x'",
+        'gy': "z'",
+        'gr': "x y2",
 
-            'rg': "x' y'",
-            'ry': "z' y'",
-            'rb': "x y",
-            'rw': "z y'",
+        'rg': "x' y'",
+        'ry': "z' y'",
+        'rb': "x y",
+        'rw': "z y'",
 
-            'bo': "x",
-            'bw': 'z y2',
-            'br': "x' y2",
-            'by': "z' y2",
+        'bo': "x",
+        'bw': 'z y2',
+        'br': "x' y2",
+        'by': "z' y2",
 
-            'yg': "z2 y'",
-            'yo': "z2",
-            'yb': 'z2 y',
-            'yr': 'z2 y2',
+        'yg': "z2 y'",
+        'yo': "z2",
+        'yb': 'z2 y',
+        'yr': 'z2 y2',
 
-            'ob': "x' y",
-            'oy': "z' y",
-            'og': "x y'",
-            'ow': "z y",
-        }
+        'ob': "x' y",
+        'oy': "z' y",
+        'og': "x y'",
+        'ow': "z y",
+    }
 
-        return mapper[value].split(' ')
+    return mapper[value].split(' ')
         
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get the position of the marker")
